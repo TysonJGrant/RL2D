@@ -4,9 +4,10 @@ var ctx = c.getContext("2d");
 c.width = window.innerWidth;
 c.height = window.innerHeight;
 
-var xpos = 0;
-var ypos = 0;
-var mouse_pos = [];
+var xpos = 100;
+var ypos = 100;
+var xmove = 0;
+var ymove = 0;
 var xcentre = window.innerWidth/2;
 var ycentre = window.innerHeight/2;
 var players = 1;
@@ -21,9 +22,8 @@ function start(){
   socket.emit('new-user',  Math.floor(Math.random()*25));
 
   socket.on('update_game', data => {
-    console.log(2);
-    xpos++;
-    ypos++;
+    xpos+=xmove;
+    ypos+=ymove;
     socket.emit('update_cell', [xpos, ypos])
     if(data.users != null)
       //redraw_game(data);
@@ -115,32 +115,25 @@ function start(){
   }
 
   function draw_background(){
-    ctx.strokeStyle = "#555555";
-    ctx.fillRect(0, 0, c.width, c.height); //draw border
+    ctx.fillStyle = "#000000";
+    ctx.fillRect(0, 0, c.width, c.height);
   }
 
   function draw_player(){
-    ctx.strokeStyle = "#aaaaaa";
-    ctx.fillRect(0, 0, 100, 60); //draw border
-  }
-
-  document.onmousemove = handleMouseMove;   //tracking mouse position and movement direction
-  function handleMouseMove(event) {
-      var eventDoc, doc, body;
-      event = event || window.event;
-      if (event.pageX == null && event.clientX != null) {
-          eventDoc = (event.target && event.target.ownerDocument) || document;
-          doc = eventDoc.documentElement;
-          body = eventDoc.body;
-
-          event.pageX = event.clientX +
-            (doc && doc.scrollLeft || body && body.scrollLeft || 0) -
-            (doc && doc.clientLeft || body && body.clientLeft || 0);
-          event.pageY = event.clientY +
-            (doc && doc.scrollTop  || body && body.scrollTop  || 0) -
-            (doc && doc.clientTop  || body && body.clientTop  || 0 );
-      }
-      mousex = event.pageX;
-      mousey = event.pageY;
+    draw_circle(xpos, ypos, 20, "#00FF00");
   }
 }
+
+window.addEventListener('gamepadconnected', (event) => {
+  const update = () => {
+    const output = document.getElementById('axes');
+    output.innerHTML = ''; // clear the output
+
+    var gamepad = navigator.getGamepads()[0];
+    xmove = gamepad.axes[0]*5;
+    ymove = gamepad.axes[1]*5;
+
+    requestAnimationFrame(update);
+  };
+  update();
+});

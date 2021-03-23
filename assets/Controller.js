@@ -15,8 +15,6 @@ window.addEventListener('gamepadconnected', (event) => {
         output.insertAdjacentHTML('beforeend',
           `<label>${gamepad.index}, ${index}
              <progress value=${button.value}></progress>
-             ${button.touched ? 'touched' : ''}
-             ${button.pressed ? 'pressed' : ''}
            </label>`);
       }
     }
