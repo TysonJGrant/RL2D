@@ -1,0 +1,27 @@
+{
+  "name": "rocket-league",
+  "version": "1.0.0",
+  "description": "Rocket League 2d using Node",
+  "main": "Controller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js",
+    "start-local": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TysonJGrant/RL2D.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TysonJGrant/RL2D/issues"
+  },
+  "homepage": "https://github.com/TysonJGrant/RL2D#readme",
+  "dependencies": {
+    "socket.io": "^4.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
+}
