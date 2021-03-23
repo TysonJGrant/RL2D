@@ -2,10 +2,10 @@
   "name": "rocket-league",
   "version": "1.0.0",
   "description": "Rocket League 2d using Node",
-  "main": "Controller.js",
+  "main": "script.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
+    "start": "node server.js",
     "start-local": "nodemon server.js"
   },
   "repository": {
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/TysonJGrant/RL2D#readme",
   "dependencies": {
+    "express": "^4.17.1",
     "socket.io": "^4.0.0"
   },
   "devDependencies": {

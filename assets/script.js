@@ -1,29 +1,15 @@
 
-var c = document.getElementById("board");
+var c = document.getElementById("field");
 var ctx = c.getContext("2d");
 c.width = window.innerWidth;
 c.height = window.innerHeight;
 
-var mousex;
-var mousey;
-var csize = 0;
-var cradius = 0;
 var xpos = 0;
 var ypos = 0;
 var mouse_pos = [];
-var xoffset = 0;
-var yoffset = 0;
 var xcentre = window.innerWidth/2;
 var ycentre = window.innerHeight/2;
-var scale = 1;
-var scale_inc = 1;
-var won = false;
-var food = [];
-var pellets = [];
-var split = false;
-var bg_on = true;
 var players = 1;
-var show_rules = false;
 var socket;
 var mobile = (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
 document.addEventListener("DOMContentLoaded", start);
@@ -35,41 +21,14 @@ function start(){
   socket.emit('new-user',  Math.floor(Math.random()*25));
 
   socket.on('update_game', data => {
-    pellets = data.pellets;
-    mines = data.mines;
-    mouse_pos = [xpos + (mousex - xcentre)/scale_inc, ypos + (mousey - ycentre)/scale_inc];
-    socket.emit('update_cell', mouse_pos)
+    console.log(2);
+    xpos++;
+    ypos++;
+    socket.emit('update_cell', [xpos, ypos])
     if(data.users != null)
-      redraw_game(data);
-  })
-
-  socket.on('update_food', changed_food => {
-    //console.log(changed_food);
-    changed_food.forEach(function(item,i){            //Draw food
-      food[item[0]] = item[1];                 //updates position of food that has been eaten
-    });
-  })
-
-  socket.on('get_self_data', data => {      //get self data to calculate 'camera' position and zoom
-    player = data.segments;
-    xpos = 0;
-    ypos = 0;
-    csize = 0;
-    //console.log(player);
-    for(i = 0; i < player.length; i++){
-      xpos += player[i].xpos;
-      ypos += player[i].ypos;
-      csize += player[i].size;
-    }
-    xpos = xpos/player.length;               //average of x and y segment positions
-    ypos = ypos/player.length;
-    cradius = Math.sqrt(csize*10/Math.PI);  //radius based on collective size and number of segments
-    xoffset = xcentre - xpos*scale_inc;
-    yoffset = ycentre - ypos*scale_inc;
-  })
-
-  socket.on('get_game_data', food_pos => {    //called when user enters and gets current food positions
-    food = food_pos;
+      //redraw_game(data);
+      draw_background();
+      draw_player();
   })
 
   function redraw_game(data){
@@ -160,6 +119,11 @@ function start(){
     ctx.fillRect(0, 0, c.width, c.height); //draw border
   }
 
+  function draw_player(){
+    ctx.strokeStyle = "#aaaaaa";
+    ctx.fillRect(0, 0, 100, 60); //draw border
+  }
+
   document.onmousemove = handleMouseMove;   //tracking mouse position and movement direction
   function handleMouseMove(event) {
       var eventDoc, doc, body;
@@ -179,51 +143,4 @@ function start(){
       mousex = event.pageX;
       mousey = event.pageY;
   }
-}
-
-document.body.onkeydown = function(e){
-    if(e.keyCode == 32 && csize >= 50){
-      if(!split){
-        socket.emit('split_cells', mouse_pos)
-      }
-      split = true;
-    }
-    else if(e.keyCode == 87){     //Shoot new pellet
-      socket.emit('shoot_pellet', mouse_pos);
-    }
-    else if(e.keyCode == 66){     //Remove background if laggy
-      bg_on = (bg_on) ? false : true;
-    }
-}
-
-document.body.onkeyup = function(e){
-    if(e.keyCode == 32){
-        split = false;;
-    }
-    else if(e.keyCode == 82){
-      show_rules = (show_rules) ? false : true;
-      if(show_rules){
-        document.getElementById("hide_rules").style.display = "none";
-        document.getElementById("show_rules").style.display = "block";
-      }
-      else{
-        document.getElementById("hide_rules").style.display = "block"
-        document.getElementById("show_rules").style.display = "none"
-      }
-    }
-}
-
-function get_all_cell_images(){
-  temp = [];
-  for(i = 0; i < 25; i++){
-    temp[i] = get_image("cells/cell_" + i + ".png");
-  }
-  return temp;
-}
-
-function get_image(location)
-{
-  base_image = new Image();
-  base_image.src = location;
-  return base_image;
 }
