@@ -18,7 +18,7 @@ class Player {
     this.boost_amount = 0;
     this.in_air = false;
     this.is_alive = true;
-    this.velocity = 10;
+    this.velocity = 0;
   }
 
   update_player(data){
