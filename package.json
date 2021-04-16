@@ -20,6 +20,7 @@
   "homepage": "https://github.com/TysonJGrant/RL2D#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "matter-js": "^0.16.1",
     "socket.io": "^4.0.0"
   },
   "devDependencies": {
