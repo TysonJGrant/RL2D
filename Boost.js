@@ -20,8 +20,8 @@ class Boost {
 
   collided(player){
     if(this.timer == 0){
-      var a = player.xpos - this.x;
-      var b = player.ypos - this.y;
+      var a = player.car.position.x - this.x;
+      var b = player.car.position.y - this.y;
       var c = Math.sqrt( a*a + b*b );
       if(c < (this.size + player.width/2) && player.boost_amount < 100){  //basically if half car car length away from centre
         this.timer = this.timer_increment;

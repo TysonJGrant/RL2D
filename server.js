@@ -1,6 +1,6 @@
 var w = 1554;
 var h = 1038;
-var goals = [0, 0];
+var score = {blue: 0, orange: 0};
 
 var Player = require('./Player.js');
 var Ball = require('./Ball.js');
@@ -51,17 +51,22 @@ var players = {};
 setInterval(function(){
   Engine.update(engine, 16);
   ball.update();
-  if(ball.goal_scored()){
+  let scored = ball.goal_scored();
+  if(scored != false){
     Object.keys(players).forEach(function(player) {
       players[player].reset_position();
-    }
-  )};
+    })
+    if(scored == "orange")
+      score.orange++;
+    else if(scored == 'blue')
+      score.blue++;
+  };
   field.update(players);
 
-  let players_info = [];
+  let players_info = {};
   let world_info = [];
   Object.keys(players).forEach(function(player) {
-    players_info.push(players[player].get_info());
+    players_info[player] = players[player].get_info();
   })
 
   let bodies = Composite.allBodies(engine.world);
@@ -76,25 +81,24 @@ setInterval(function(){
       points.push({x: vertices[j].x, y: vertices[j].y});
     world_info.push({vertices: points, angle: world_objects[i].angle});
   }
-  //console.log(players_info);
-  io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info()});
+  io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score});
 }, 50);
 
 io.on('connection', (socket) => {
-  socket.on('new-player', cel => {
+  socket.on('new-player', () => {
     //player[socket.id] = new Player(w, h);
     console.log("New Player");
-    console.log(Object.keys(players).length);
     if(Object.keys(players).length == 0)
       players[socket.id] = new Player(318, 519, 30, 14, 180);
     else
       players[socket.id] = new Player(1233, 519, 30, 14, 0);
+    socket.emit('get_self_data', {id: socket.id});
+    console.log(socket.id)
   })
 
   socket.on('update_player', data => {
     if(players[socket.id] != null){
       players[socket.id].update_player(data);
-      socket.emit('get_self_data', players[socket.id].get_info());
     }
   })
 

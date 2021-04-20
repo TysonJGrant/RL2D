@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="stylesheet" href="style/circle.css">
   <title>RL2D</title>
   <script src="/socket.io/socket.io.js"></script>
 
@@ -12,6 +13,22 @@
 <canvas id="field" style="margin: auto; display: block;" width=1554; height=1040></canvas>
 
 <div id="axes" style="position:absolute; top:10px; right:10px; width:200px;"></div>
+<div id="hud" style="position:absolute; top:10px; right:10px;">
+  <div style="width: 240px; height: 50px; background-color: black; text-align: center; color: white; display: flex; font-size: 42px; font-family: monospace,monospace; font-weight: 100;">
+    <div id="blue_score" style="width: 25%; height: 100%; background-color: royalBlue;"> 0 </div>
+    <div style="width: 50%; background-color: black; margin: auto; font-size: 28px;">	1:51 </div>
+    <div id="orange_score" style="width: 25%; background-color: orange; float: right;">	0 </div>
+  </div>
+
+  <div class="c100 p25" id="boost_bar" style="top:20px">
+    <span id="boost_amount">25%</span>
+    <div class="slice">
+      <div class="bar"></div>
+      <div class="fill"></div>
+    </div>
+  </div>
+</div>
+
 <script src='Controller.js'></script>
 <script src='Trail.js'></script>
 <script src='Particle.js'></script>

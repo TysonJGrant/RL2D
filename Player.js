@@ -1,79 +1,109 @@
 class Player {
   constructor(xpos, ypos, width, height, angle) {
     this.options = {
-      restitution: 0.8,
-      friction: 0.5
+      restitution: 0.1,
+      friction: 0.5,
+      frictionAir: 0.05
     };
     this.initials = {x: xpos, y: ypos, angle: angle}
     this.car = global.Bodies.rectangle(xpos, ypos, width, height, this.options);
     global.World.add(global.engine.world, this.car);
     this.MAX_SPEED = 10;
     this.BOOST_SPEED = 15;
-    this.xpos = xpos;
-    this.ypos = ypos;
     this.width = width;
     this.height = height;
     this.car_angle = angle;         //way car is pointing
-    this.travelling_angle = 0;  //way car is travelling. say in air
-    this.boost_amount = 0;
-    this.in_air = false;
+    this.travelling_angle = angle;  //way car is travelling. say in air
+    this.boost_amount = 33;
+    this.jump_still_held = false;   //needs to know difference between holding jump and dashing
+    this.has_dashed = false;        //only dash once per jump
+    this.in_air = 0;
     this.is_alive = true;
+    this.is_boosting = false;
+    this.is_drifting = false;
     this.velocity = 0;
+    global.Body.setMass(this.car, 4);
+  }
+
+  manage_controller_input(data){
+    console.log(data.joystick_angle);
+    this.drifting = data.drift;
+    if(this.in_air == 0)
+      this.has_dashed = false;
+    if(!data.jump)
+      this.jump_still_held = false;
+
+    if(data.jump && this.in_air == 0 && !this.jump_still_held){   //initial jump
+      this.in_air = 20;
+      this.jump_still_held = true;
+    }
+    else if(data.jump && this.in_air > 0 && !this.jump_still_held && !this.has_dashed){   //dashing
+      this.has_dashed = true;
+      this.in_air += 10;
+      if(data.joystick_angle != -1)
+        this.travelling_angle = data.joystick_angle
+      //console.log(data.joystick_angle);
+    }
+  }
+
+  manage_boost(data){
+    if(data.is_boosting && this.boost_amount > 0){
+      this.is_boosting = true;
+      this.boost_amount-=2;
+      if(this.boost_amount < 0)
+        this.boost_amount = 0;
+    }
+    else
+      this.is_boosting = false;
+  }
+
+  manage_angle(data){
+    this.car_angle += data.lr_stick*this.velocity/2;
+    if(this.in_air == 0)
+      this.travelling_angle = this.car_angle;
+    let xspeed = -Math.cos(this.travelling_angle / (180 / Math.PI));
+    let yspeed = -Math.sin(this.travelling_angle / (180 / Math.PI));
+    //console.log(this.travelling_angle)
+    global.Body.setAngle(this.car, this.car_angle*Math.PI/180);
+    this.travelling_angle = this.travelling_angle % 360;
+    return {x: this.velocity*xspeed, y: this.velocity*yspeed};
+  }
+
+  manage_velocity(data){
+    if(this.in_air == 0){
+      let vel = Math.sqrt((this.car.velocity.x * this.car.velocity.x) + (this.car.velocity.y * this.car.velocity.y));  //get velocity of body
+      if(this.velocity < 0)
+        this.velocity = -vel;
+      else
+        this.velocity = vel;
+
+      let change = data.pedal;    //amount to accelerate by
+
+      if(change > 0){       //player controlled acceleration
+        if(this.is_boosting)
+          this.accelerate(this.BOOST_SPEED, change);
+        else
+          this.accelerate(this.MAX_SPEED, change);
+      }
+      else if(change < 0)
+        this.decelerate(-this.MAX_SPEED, -change);
+    }
+    global.Body.setVelocity(this.car, this.manage_angle(data));
   }
 
   update_player(data){
-    this.travelling_angle = this.car_angle;
-    if(this.velocity != 0)
-      this.car_angle += data.lr_stick*this.velocity/2;
-    /*
-    let max_speed = data.pedal*5; //max speed depends on how far trigger is held
-    let change = data.pedal/2;    //amount to accelerate by
-    console.log(change);
-    if(this.velocity < max_speed){
-      if(max_speed < 0)          //if needs to go slower
-        this.decelerate(max_speed, change);
-      else                      //if needs to go faster
-        this.accelerate(max_speed, change);
-    }
-    else{
-      if(max_speed < 0)          //if needs to go faster
-        this.accelerate(max_speed, change);
-      else                      //if needs to go slower
-        this.decelerate(max_speed, change);
-    }
-    */
-    //this.travelling_angle = this.car_angle;
-    //if(data.pedal < 0)
-      //this.travelling_angle - this.car_angle;   //player reversing
-
-    //this.velocity += data.pedal;
-    if(this.velocity > 0)       //standard deceleration based on friction
-      this.decelerate(0, 0.2);
-    else if(this.velocity < 0)
-      this.accelerate(0, 0.2);
-
-    let change = data.pedal;    //amount to accelerate by
-
-    if(change > 0)       //player controlled acceleration
-      this.accelerate(this.MAX_SPEED, change);
-    else if(change < 0)
-      this.decelerate(-this.MAX_SPEED, -change);
-
-    let xspeed = -Math.cos(this.car_angle / (180 / Math.PI));
-    let yspeed = -Math.sin(this.car_angle / (180 / Math.PI));
-    this.xpos += this.velocity*xspeed;
-    this.ypos += this.velocity*yspeed;
-    //global.Body.setPosition(this.car, {x: this.xpos, y: this.ypos});
-    global.Body.setVelocity(this.car, {x: this.velocity*xspeed, y: this.velocity*yspeed});
-    //console.log(this.car.velocity)
-    global.Body.setAngle(this.car, this.car_angle*Math.PI/180);
-    //console.log(this.velocity*xspeed);
+    if(this.in_air > 0)
+      this.in_air--;
+    this.manage_controller_input(data);
+    this.manage_boost(data);
+    this.manage_velocity(data);
   }
 
   reset_position(){
     global.Body.setPosition(this.car, {x: this.initials.x, y: this.initials.y});
     this.velocity = 0;
     this.car_angle = this.initials.angle;
+    this.boost_amount = 33;
     //console.log(this.car.velocity)
     //global.Body.setAngle(this.car, this.car_angle*Math.PI/180);
   }

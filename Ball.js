@@ -6,7 +6,8 @@ class Ball {
     this.index = 0;
     this.options = {
       restitution: 0.8,
-      friction: 0.5
+      friction: 0.01,
+      frictionAir: 0.01
     };
     this.ball = global.Bodies.circle(x, y, r, this.options);
     this.radius = r;
@@ -33,12 +34,12 @@ class Ball {
     if(this.ball.position.x < 154){
       global.Body.setPosition(this.ball, {x: this.x, y: this.y});
       global.Body.setVelocity(this.ball, {x: 0, y: 0});
-      return true;
+      return "orange";
     }
     else if(this.ball.position.x > 1400){
       global.Body.setPosition(this.ball, {x: this.x, y: this.y});
       global.Body.setVelocity(this.ball, {x: 0, y: 0});
-      return true;
+      return "blue";
     }
     return false;
   }
