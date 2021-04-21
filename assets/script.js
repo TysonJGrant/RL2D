@@ -144,7 +144,7 @@ function draw_dust(){
     if(dusts[player] == undefined)
       dusts[player] = new Dust(current.x, current.y);
     dust = dusts[player];
-    dust.update({x: current.x, y: current.y}, drift);
+    dust.update({x: current.x, y: current.y}, drift && current.in_air == 0);
     particles = dust.get_particles();
     for(let i = 0; i < particles.length; i++){
       p = particles[i];
