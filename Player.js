@@ -78,7 +78,7 @@ class Player {
   }
 
   manage_angle(data){
-    
+
     if(this.in_air)
       this.car_angle += data.lr_stick*8;
     else
@@ -89,10 +89,10 @@ class Player {
         this.has_dashed = false;
         this.waiting_to_land = false;
         let difference = (this.travelling_angle - this.car_angle);
-        console.log(this.velocity)
+        //console.log(this.velocity)
         this.velocity *= Math.cos(difference / (180 / Math.PI));
-        console.log(difference)
-        console.log(this.velocity)
+        //console.log(difference)
+        //console.log(this.velocity)
         this.travelling_angle = this.car_angle;
         //xspeed = -Math.cos(this.travelling_angle / (180 / Math.PI));
         //yspeed = -Math.sin(this.travelling_angle / (180 / Math.PI));
