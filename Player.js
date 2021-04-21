@@ -3,7 +3,7 @@ class Player {
     this.options = {
       restitution: 0.1,
       friction: 0.5,
-      frictionAir: 0.05
+      frictionAir: 0.02
     };
     this.initials = {x: xpos, y: ypos, angle: angle}
     this.car = global.Bodies.rectangle(xpos, ypos, width, height, this.options);
@@ -26,7 +26,7 @@ class Player {
   }
 
   manage_controller_input(data){
-    console.log(data.joystick_angle);
+    //console.log(data.joystick_angle);
     this.drifting = data.drift;
     if(this.in_air == 0)
       this.has_dashed = false;
@@ -39,9 +39,17 @@ class Player {
     }
     else if(data.jump && this.in_air > 0 && !this.jump_still_held && !this.has_dashed){   //dashing
       this.has_dashed = true;
-      this.in_air += 10;
-      if(data.joystick_angle != -1)
-        this.travelling_angle = data.joystick_angle
+      this.in_air += 10;     //Dashing velocity is affected by current velocity
+        //let xspeed = -Math.cos(this.travelling_angle / (180 / Math.PI));
+        //let yspeed = -Math.sin(this.travelling_angle / (180 / Math.PI));
+        console.log(data.joystick_angle);
+        //this.travelling_angle = data.joystick_angle;
+        console.log(this.car.velocity);
+        global.Body.setVelocity(this.car, {x: this.car.velocity.x + data.joystick_angle.x*5, y: this.car.velocity.y + data.joystick_angle.y*5});
+        console.log(this.car.velocity);
+        console.log("-")
+        this.travelling_angle = Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI) + 180;//]; / (180 / Math.PI));
+
       //console.log(data.joystick_angle);
     }
   }
@@ -58,35 +66,45 @@ class Player {
   }
 
   manage_angle(data){
-    this.car_angle += data.lr_stick*this.velocity/2;
-    if(this.in_air == 0)
+    if(this.in_air)
+      this.car_angle += data.lr_stick*8;
+    else
+      this.car_angle += data.lr_stick*this.velocity/2;
+
+    if(this.in_air == 0 && !this.drifting)
       this.travelling_angle = this.car_angle;
     let xspeed = -Math.cos(this.travelling_angle / (180 / Math.PI));
     let yspeed = -Math.sin(this.travelling_angle / (180 / Math.PI));
     //console.log(this.travelling_angle)
     global.Body.setAngle(this.car, this.car_angle*Math.PI/180);
     this.travelling_angle = this.travelling_angle % 360;
+    this.car_angle = this.car_angle % 360;
     return {x: this.velocity*xspeed, y: this.velocity*yspeed};
   }
 
   manage_velocity(data){
+    let vel = Math.sqrt((this.car.velocity.x * this.car.velocity.x) + (this.car.velocity.y * this.car.velocity.y));  //get velocity of body
+    if(this.velocity < 0)
+      this.velocity = -vel;
+    else
+      this.velocity = vel;
+
     if(this.in_air == 0){
-      let vel = Math.sqrt((this.car.velocity.x * this.car.velocity.x) + (this.car.velocity.y * this.car.velocity.y));  //get velocity of body
-      if(this.velocity < 0)
-        this.velocity = -vel;
-      else
-        this.velocity = vel;
-
-      let change = data.pedal;    //amount to accelerate by
-
-      if(change > 0){       //player controlled acceleration
-        if(this.is_boosting)
-          this.accelerate(this.BOOST_SPEED, change);
-        else
-          this.accelerate(this.MAX_SPEED, change);
+      if(this.drifting){
+        this.decelerate(0, 0.15);
       }
-      else if(change < 0)
-        this.decelerate(-this.MAX_SPEED, -change);
+      else{
+        let change = data.pedal;    //amount to accelerate by
+
+        if(change > 0){       //player controlled acceleration
+          if(this.is_boosting)
+            this.accelerate(this.BOOST_SPEED, change);
+          else
+            this.accelerate(this.MAX_SPEED, change);
+        }
+        else if(change < 0)
+          this.decelerate(-this.MAX_SPEED, -change);
+      }
     }
     global.Body.setVelocity(this.car, this.manage_angle(data));
   }

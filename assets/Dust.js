@@ -1,13 +1,13 @@
-class Trail {
+class Dust {
   constructor(xpos, ypos) {
     this.x = xpos;
     this.y = ypos;
     this.particles = [];
-    this.col = "0, 0, 255";
+    this.col = "150, 75, 0";
   }
 
-  update(pos, is_boosting){
-    if(is_boosting){
+  update(pos, is_drifting){
+    if(is_drifting){
       this.particles.push(new Particle(pos.x, pos.y));
       if(this.particles.length > 40)
         this.particles.shift();

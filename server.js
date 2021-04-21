@@ -1,6 +1,7 @@
 var w = 1554;
 var h = 1038;
 var score = {blue: 0, orange: 0};
+var timer = 300;
 
 var Player = require('./Player.js');
 var Ball = require('./Ball.js');
@@ -62,6 +63,8 @@ setInterval(function(){
       score.blue++;
   };
   field.update(players);
+  if(Object.keys(players).length == 1)
+    timer -= 0.05;
 
   let players_info = {};
   let world_info = [];
@@ -81,7 +84,7 @@ setInterval(function(){
       points.push({x: vertices[j].x, y: vertices[j].y});
     world_info.push({vertices: points, angle: world_objects[i].angle});
   }
-  io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score});
+  io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score, timer: Math.round(timer)});
 }, 50);
 
 io.on('connection', (socket) => {
