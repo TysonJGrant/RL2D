@@ -50,7 +50,7 @@ var players = {};
 
 //Main loop
 setInterval(function(){
-  Engine.update(engine, 16);
+  //Engine.update(engine, 16);
   ball.update();
   let scored = ball.goal_scored();
   if(scored != false){
@@ -84,6 +84,7 @@ setInterval(function(){
       points.push({x: vertices[j].x, y: vertices[j].y});
     world_info.push({vertices: points, angle: world_objects[i].angle});
   }
+  Engine.update(engine, 16);
   io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score, timer: Math.round(timer)});
 }, 50);
 

@@ -66,7 +66,7 @@ function start(){
       seconds = '0' + seconds;
     timer.innerHTML = Math.floor(data.timer/60) + ":" + seconds;
     socket.emit('update_player', {drift: drift, joystick_angle: joystick_angle, jump: jump, pedal: pedal, lr_stick: lr_stick, is_boosting: is_boosting});
-    if(Object.keys(players).length != 0){
+    if(Object.keys(players).length != 0 && id != ""){
       draw_background(data.boosts, data.big_boosts);
       if(show_bodies)
         window.requestAnimationFrame(render);
@@ -80,6 +80,7 @@ function start(){
 
   socket.on('get_self_data', data => {
     id = data.id;
+    console.log(id)
   })
 
   socket.on('get_game_data', food_pos => {    //called when user enters and gets current food positions
