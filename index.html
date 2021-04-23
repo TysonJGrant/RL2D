@@ -13,14 +13,14 @@
 <canvas id="field" style="margin: auto; display: block;" width=1554; height=1040></canvas>
 
 <div id="axes" style="position:absolute; top:10px; right:10px; width:200px;"></div>
-<div id="hud" style="position:absolute; top:10px; right:10px;">
+<div id="hud" style="position:absolute; top:10px; right:10px; display: block">
   <div style="width: 240px; height: 50px; background-color: black; text-align: center; color: white; display: flex; font-size: 42px; font-family: monospace,monospace; font-weight: 100;">
     <div id="blue_score" style="width: 25%; height: 100%; background-color: royalBlue;"> 0 </div>
     <div id="timer" style="width: 50%; background-color: black; margin: auto; font-size: 28px;">	5:00 </div>
     <div id="orange_score" style="width: 25%; background-color: orange; float: right;">	0 </div>
   </div>
 
-  <div class="c100 p25" id="boost_bar" style="top:20px">
+  <div class="c100 p25" id="boost_bar" style="top:20px; display: none">
     <span id="boost_amount">25%</span>
     <div class="slice">
       <div class="bar"></div>

@@ -65,8 +65,9 @@ function start(){
     if(seconds < 10)
       seconds = '0' + seconds;
     timer.innerHTML = Math.floor(data.timer/60) + ":" + seconds;
-    socket.emit('update_player', {drift: drift, joystick_angle: joystick_angle, jump: jump, pedal: pedal, lr_stick: lr_stick, is_boosting: is_boosting});
-    if(Object.keys(players).length != 0 && id != ""){
+    if(id != "")
+      socket.emit('update_player', {drift: drift, joystick_angle: joystick_angle, jump: jump, pedal: pedal, lr_stick: lr_stick, is_boosting: is_boosting});
+    if(Object.keys(players).length != 0){
       draw_background(data.boosts, data.big_boosts);
       if(show_bodies)
         window.requestAnimationFrame(render);
@@ -74,12 +75,14 @@ function start(){
       draw_dust();
       draw_players();
       draw_ball();
-      draw_hud();
+      if(id != "")
+        draw_hud();
     }
   })
 
   socket.on('get_self_data', data => {
     id = data.id;
+    document.getElementById("boost_bar").style.display = "block";
     console.log(id)
   })
 
@@ -220,7 +223,16 @@ function get_image(location)
 }
 
 
-
+function show_controller_input(){
+  ctx.font = "30px Arial";
+  ctx.fillStyle = "red";
+  ctx.fillText("Jump: " + jump, 1200, 50);
+  ctx.fillText("in air: " + players[id].in_air, 1200, 80);
+  ctx.fillText("Boost: " + players[id].boost_amount, 1200, 110);
+  ctx.fillText("velocity: " + players[id].velocity, 1200, 140);
+  ctx.fillText("pedal: " + pedal, 1200, 170);
+  ctx.fillText("Drift: " + drift, 1200, 200);
+}
 
 //Record all necessary controller touches
 window.addEventListener('gamepadconnected', (event) => {
@@ -243,14 +255,7 @@ window.addEventListener('gamepadconnected', (event) => {
     pedal = gamepad.buttons[7].value - gamepad.buttons[6].value;     //right trigger - left trigger
     //console.log(gamepad.buttons[7]);
 
-    ctx.font = "30px Arial";
-    ctx.fillStyle = "red";
-    ctx.fillText("Jump: " + jump, 1200, 50);
-    ctx.fillText("in air: " + players[id].in_air, 1200, 80);
-    ctx.fillText("Boost: " + players[id].boost_amount, 1200, 110);
-    ctx.fillText("velocity: " + players[id].velocity, 1200, 140);
-    ctx.fillText("pedal: " + pedal, 1200, 170);
-    ctx.fillText("Drift: " + drift, 1200, 200);
+    //show_controller_input();
     requestAnimationFrame(update);
   };
   update();

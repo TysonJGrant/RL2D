@@ -91,13 +91,17 @@ setInterval(function(){
 io.on('connection', (socket) => {
   socket.on('new-player', () => {
     //player[socket.id] = new Player(w, h);
-    console.log("New Player");
-    if(Object.keys(players).length == 0)
-      players[socket.id] = new Player(318, 519, 30, 14, 180);
-    else
-      players[socket.id] = new Player(1233, 519, 30, 14, 0);
-    socket.emit('get_self_data', {id: socket.id});
-    console.log(socket.id)
+    if(Object.keys(players).length < 2){
+      if(Object.keys(players).length == 0)
+        players[socket.id] = new Player(318, 519, 30, 14, 180);
+      else if(Object.keys(players).length == 1)
+        players[socket.id] = new Player(1233, 519, 30, 14, 0);
+      console.log("New Player. ID: " + socket.id);
+      socket.emit('get_self_data', {id: socket.id});
+    }
+    else{
+      console.log("new Spectator");
+    }
   })
 
   socket.on('update_player', data => {
