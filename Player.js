@@ -1,5 +1,5 @@
 class Player {
-  constructor(xpos, ypos, width, height, angle) {
+  constructor(xpos, ypos, width, height, angle, colour) {
     this.options = {
       restitution: 0.1,
       friction: 0.5,
@@ -13,6 +13,7 @@ class Player {
     this.MAX_ANGULAR_VELOCITY = 20;
     this.width = width;
     this.height = height;
+    this.colour = colour;
     this.jump_still_held = false;   //needs to know difference between holding jump and dashing
     this.has_dashed = false;        //only dash once per jump
     this.in_air = 0;
@@ -212,8 +213,13 @@ class Player {
       boost_amount: this.boost_amount,
       in_air: this.in_air,
       is_alive: this.is_alive,
-      velocity: this.velocity
+      velocity: this.velocity,
+      colour: this.colour
     }
+  }
+
+  destroy(){
+    global.Composite.remove(global.engine.world, this.car);
   }
 }
 

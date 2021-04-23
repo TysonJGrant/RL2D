@@ -63,8 +63,10 @@ setInterval(function(){
       score.blue++;
   };
   field.update(players);
-  if(Object.keys(players).length == 1)
+  if(Object.keys(players).length > 1)
     timer -= 0.05;
+  else 
+    timer = 300;
 
   let players_info = {};
   let world_info = [];
@@ -93,9 +95,15 @@ io.on('connection', (socket) => {
     //player[socket.id] = new Player(w, h);
     if(Object.keys(players).length < 2){
       if(Object.keys(players).length == 0)
-        players[socket.id] = new Player(318, 519, 30, 14, 180);
-      else if(Object.keys(players).length == 1)
-        players[socket.id] = new Player(1233, 519, 30, 14, 0);
+        players[socket.id] = new Player(318, 519, 30, 14, 180, "blue");
+      else if(Object.keys(players).length == 1){
+        Object.keys(players).forEach(function(player) {
+          if(players[player].colour == "blue")
+            players[socket.id] = new Player(1233, 519, 30, 14, 0, "orange");
+          else
+            players[socket.id] = new Player(318, 519, 30, 14, 180, "blue");
+        })
+      }
       console.log("New Player. ID: " + socket.id);
       socket.emit('get_self_data', {id: socket.id});
     }
@@ -111,7 +119,9 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    socket.broadcast.emit('player-disconnected', players[socket.id])
+    console.log(socket.id + " disconnected");
+    if(players[socket.id] != undefined)
+      players[socket.id].destroy();
     delete players[socket.id]
   })
 })
