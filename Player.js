@@ -44,16 +44,23 @@ class Player {
   }
 
   relative_to_car(data){
-    let joystick_angle = Math.atan2(data.joystick_angle.y, data.joystick_angle.x) * (180 / Math.PI) + 90;//]; / (180 / Math.PI));    //do some maths
-    let temp_angle = joystick_angle + this.car_angle;
-    let xspeed = -Math.cos(temp_angle / (180 / Math.PI));
-    let yspeed = -Math.sin(temp_angle / (180 / Math.PI));
-    global.Body.setVelocity(this.car, {x: this.car.velocity.x + xspeed*8, y: this.car.velocity.y + yspeed*8});
-    if(this.velocity < 0)
-      this.travelling_angle = -Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI) + 180;//]; / (180 / Math.PI));
-    else
-      this.travelling_angle = Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI) + 180;//]; / (180 / Math.PI));
-    this.angular_velocity = 0;
+    if(!(data.joystick_angle.x == 0 && data.joystick_angle.y == 0)){
+      let joystick_angle = Math.atan2(data.joystick_angle.y, data.joystick_angle.x) * (180 / Math.PI) + 90;//]; / (180 / Math.PI));    //do some maths
+      let temp_angle = joystick_angle + this.car_angle;
+      let xspeed = -Math.cos(temp_angle / (180 / Math.PI));
+      let yspeed = -Math.sin(temp_angle / (180 / Math.PI));
+      //console.log(this.car.velocity)
+      // console.log(this.car.velocity.y + yspeed*8);
+      global.Body.setVelocity(this.car, {x: this.car.velocity.x + xspeed*8, y: this.car.velocity.y + yspeed*8});
+      //console.log(xspeed + " " + yspeed)
+      //console.log(this.car.velocity)
+      if(this.velocity < 0)
+        this.travelling_angle = Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI);//]; / (180 / Math.PI));
+      else
+        this.travelling_angle = Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI) + 180;//]; / (180 / Math.PI));      console.log(this.car.velocity)
+      //console.log(this.velocity)
+      this.angular_velocity = 0;
+    }
   }
 
   dash(data){
@@ -64,6 +71,7 @@ class Player {
   }
 
   manage_controller_input(data){
+    //console.log(this.travelling_angle)
     this.is_drifting = data.drift;
 
     if(this.is_drifting && this.in_air == 0)    //holding drift on ground
@@ -96,7 +104,8 @@ class Player {
   manage_angle(data){
 
     if(this.in_air == 0){           //on ground and not drifting
-      this.angular_velocity = data.lr_stick*this.velocity/2;
+      this.angular_velocity = data.lr_stick*this.velocity/(1+(this.velocity*this.velocity/100));
+      console.log(this.angular_velocity)
       if(!this.is_drifting){
         //this.car_angle += data.lr_stick*this.velocity/2;
         if(this.waiting_to_land){                //just landed or stopped drfting
@@ -112,7 +121,7 @@ class Player {
       else
         this.car_angle += this.angular_velocity;
     }
-    else{
+    else{                         //in air
       if(data.lr_stick == 0)      //naturally slow spin if not using joystick_angle
         this.angular_velocity /= 1.2;
 

@@ -32,16 +32,19 @@ class Ball {
 
   goal_scored(){
     if(this.ball.position.x < 154){
-      global.Body.setPosition(this.ball, {x: this.x, y: this.y});
-      global.Body.setVelocity(this.ball, {x: 0, y: 0});
+      this.reset_position()
       return "orange";
     }
     else if(this.ball.position.x > 1400){
-      global.Body.setPosition(this.ball, {x: this.x, y: this.y});
-      global.Body.setVelocity(this.ball, {x: 0, y: 0});
+      this.reset_position()
       return "blue";
     }
     return false;
+  }
+
+  reset_position(){
+    global.Body.setPosition(this.ball, {x: this.x, y: this.y});
+    global.Body.setVelocity(this.ball, {x: 0, y: 0});
   }
 
   get_info(){

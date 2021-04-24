@@ -60,8 +60,6 @@ function start(){
       c.style.width = window.innerHeight*game_ratio + "px";
       c.style.height = window.innerHeight + "px";
     }
-    console.log(c.style.width + "  " + c.style.height);
-
     players = data.players;
     ball = data.ball;
     bodies = data.bodies;

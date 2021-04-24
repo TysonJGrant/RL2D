@@ -65,7 +65,7 @@ setInterval(function(){
   field.update(players);
   if(Object.keys(players).length > 1)
     timer -= 0.05;
-  else 
+  else
     timer = 300;
 
   let players_info = {};
@@ -98,6 +98,8 @@ io.on('connection', (socket) => {
         players[socket.id] = new Player(318, 519, 30, 14, 180, "blue");
       else if(Object.keys(players).length == 1){
         Object.keys(players).forEach(function(player) {
+          players[player].reset_position();
+          ball.reset_position();
           if(players[player].colour == "blue")
             players[socket.id] = new Player(1233, 519, 30, 14, 0, "orange");
           else
