@@ -44,13 +44,20 @@ var mobile = (typeof window.orientation !== "undefined") || (navigator.userAgent
 document.addEventListener("DOMContentLoaded", start);
 document.getElementById('axes').style.display='none';
 
+var thisLoop = new Date();
+var fps = 1000 / (thisLoop - lastLoop);
+var lastLoop = thisLoop;
+
 function start(){
   socket = io();
-
   //const name = prompt('What is your name?')
   socket.emit('new-player');
 
   socket.on('update_game', data => {
+    // thisLoop = new Date();
+    // fps = 1000 / (thisLoop - lastLoop);
+    // lastLoop = thisLoop;
+    //console.log(fps)
     screen_ratio = window.innerWidth/window.innerHeight;    //fill screen
     if(screen_ratio < game_ratio){
       c.style.width = window.innerWidth + "px";

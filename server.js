@@ -50,7 +50,7 @@ var players = {};
 
 //Main loop
 setInterval(function(){
-  //Engine.update(engine, 16);
+  Engine.update(engine, 16);
   ball.update();
   let scored = ball.goal_scored();
   if(scored != false){
@@ -74,19 +74,15 @@ setInterval(function(){
     players_info[player] = players[player].get_info();
   })
 
-  let bodies = Composite.allBodies(engine.world);
-  world_objects = bodies;   //delete this when only need to pass world builds, not everything
-  //console.log(bodies);
-  //console.log(players)
-  //console.log(world_objects);
-  for (var i = 0; i < world_objects.length; i ++) {
-    let vertices = world_objects[i].vertices;
-    let points = [];
-    for (var j = 0; j < vertices.length; j ++)
-      points.push({x: vertices[j].x, y: vertices[j].y});
-    world_info.push({vertices: points, angle: world_objects[i].angle});
-  }
-  Engine.update(engine, 16);
+  // let bodies = Composite.allBodies(engine.world);
+  // world_objects = bodies;   //delete this when only need to pass world builds, not everything
+  // for (var i = 0; i < world_objects.length; i ++) {
+  //   let vertices = world_objects[i].vertices;
+  //   let points = [];
+  //   for (var j = 0; j < vertices.length; j ++)
+  //     points.push({x: vertices[j].x, y: vertices[j].y});
+  //   world_info.push({vertices: points, angle: world_objects[i].angle});
+  // }
   io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score, timer: Math.round(timer)});
 }, 50);
 
