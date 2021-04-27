@@ -102,8 +102,10 @@ class Player {
   }
 
   manage_angle(data){
+    console.log(this.velocity)
     if(this.in_air == 0){           //on ground and not drifting
       this.angular_velocity = data.lr_stick*this.velocity/(1+(this.velocity*this.velocity/100));
+      console.log(this.angular_velocity)
       if(!this.is_drifting){
         //this.car_angle += data.lr_stick*this.velocity/2;
         if(this.waiting_to_land){                //just landed or stopped drfting
@@ -141,7 +143,11 @@ class Player {
   }
 
   manage_velocity(data){
-    let vel = Math.abs(Math.sqrt((this.car.velocity.x * this.car.velocity.x) + (this.car.velocity.y * this.car.velocity.y)));  //get velocity of body
+    let vel = Math.sqrt((this.car.velocity.x * this.car.velocity.x) + (this.car.velocity.y * this.car.velocity.y));  //get velocity of body
+    if(this.velocity < 0)
+      this.velocity = -vel;
+    else
+      this.velocity = vel;
 
     if(this.in_air == 0){
       if(this.is_drifting){
