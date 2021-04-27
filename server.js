@@ -64,7 +64,7 @@ setInterval(function(){
   };
   field.update(players);
   if(Object.keys(players).length > 1)
-    timer -= 0.05;
+    timer -= 0.04;
   else
     timer = 300;
 
@@ -84,7 +84,7 @@ setInterval(function(){
   //   world_info.push({vertices: points, angle: world_objects[i].angle});
   // }
   io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score, timer: Math.round(timer)});
-}, 50);
+}, 40);
 
 io.on('connection', (socket) => {
   socket.on('new-player', () => {

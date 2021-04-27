@@ -32,6 +32,7 @@ class Player {
     this.travelling_angle = this.initials.angle;  //way car is travelling. say in air
     this.boost_amount = 33;
     this.angular_velocity = 0;
+    this.in_air = 0;
   }
 
   relative_to_screen(data){
@@ -49,16 +50,11 @@ class Player {
       let temp_angle = joystick_angle + this.car_angle;
       let xspeed = -Math.cos(temp_angle / (180 / Math.PI));
       let yspeed = -Math.sin(temp_angle / (180 / Math.PI));
-      //console.log(this.car.velocity)
-      // console.log(this.car.velocity.y + yspeed*8);
       global.Body.setVelocity(this.car, {x: this.car.velocity.x + xspeed*8, y: this.car.velocity.y + yspeed*8});
-      //console.log(xspeed + " " + yspeed)
-      //console.log(this.car.velocity)
       if(this.velocity < 0)
         this.travelling_angle = Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI);//]; / (180 / Math.PI));
       else
         this.travelling_angle = Math.atan2(this.car.velocity.y, this.car.velocity.x) * (180 / Math.PI) + 180;//]; / (180 / Math.PI));      console.log(this.car.velocity)
-      //console.log(this.velocity)
       this.angular_velocity = 0;
     }
   }
@@ -71,7 +67,6 @@ class Player {
   }
 
   manage_controller_input(data){
-    //console.log(this.travelling_angle)
     this.is_drifting = data.drift;
 
     if(this.is_drifting && this.in_air == 0)    //holding drift on ground
@@ -102,12 +97,9 @@ class Player {
   }
 
   manage_angle(data){
-    console.log(this.velocity)
-    if(this.in_air == 0){           //on ground and not drifting
+    if(this.in_air == 0){           //on ground
       this.angular_velocity = data.lr_stick*this.velocity/(1+(this.velocity*this.velocity/100));
-      console.log(this.angular_velocity)
       if(!this.is_drifting){
-        //this.car_angle += data.lr_stick*this.velocity/2;
         if(this.waiting_to_land){                //just landed or stopped drfting
           this.angular_velocity = 0;
           this.has_dashed = false;
@@ -151,7 +143,7 @@ class Player {
 
     if(this.in_air == 0){
       if(this.is_drifting){
-        this.decelerate(0, 0.15);
+        this.decelerate(0, 0.5);     //decelerate during drift
       }
       else{
         let change = data.pedal*0.8;    //amount to accelerate by
@@ -171,8 +163,6 @@ class Player {
     else if(this.is_boosting){                //in air and boosting
       let xspeed = -Math.cos(this.car_angle / (180 / Math.PI));
       let yspeed = -Math.sin(this.car_angle / (180 / Math.PI));
-      //console.log(this.car.velocity)
-      // console.log(this.car.velocity.y + yspeed*8);
       global.Body.setVelocity(this.car, {x: this.car.velocity.x + xspeed*0.4, y: this.car.velocity.y + yspeed*0.4});
       this.velocity = Math.abs(Math.sqrt((this.car.velocity.x * this.car.velocity.x) + (this.car.velocity.y * this.car.velocity.y)));
       if(this.velocity < 0)
@@ -184,7 +174,6 @@ class Player {
   }
 
   update_player(data){
-    //console.log(this.velocity)
     if(this.in_air > 0)
       this.in_air--;
     this.manage_controller_input(data);
