@@ -32,6 +32,7 @@ var jump = false;
 var drift = false;
 var pedal = 0;    //amount left or right trigger is held to calculate velocity
 
+var single_player = false;
 var show_rules = false;
 var players = {};
 var ball = {x: 0, y: 0, radius: 20};
@@ -77,7 +78,7 @@ function start(){
       seconds = '0' + seconds;
     timer.innerHTML = Math.floor(data.timer/60) + ":" + seconds;
     if(id != "")
-      socket.emit('update_player', {drift: drift, joystick_angle: joystick_angle, jump: jump, pedal: pedal, lr_stick: lr_stick, is_boosting: is_boosting});
+      socket.emit('update_player', {drift: drift, joystick_angle: joystick_angle, jump: jump, pedal: pedal, lr_stick: lr_stick, is_boosting: is_boosting, single_player: single_player});
     if(Object.keys(players).length != 0){
       draw_background(data.boosts, data.big_boosts);
       if(show_bodies)
@@ -141,7 +142,7 @@ function draw_trails(){
     if(trails[player] == undefined)
       trails[player] = new Trail(current.x, current.y);
     trail = trails[player];
-    trail.update({x: current.x, y: current.y}, current.boost_amount > 0 && is_boosting);
+    trail.update({x: current.x, y: current.y}, current.boost_amount > 0 && current.boost);
     particles = trail.get_particles();
     for(let i = 0; i < particles.length; i++){
       p = particles[i];
@@ -159,7 +160,7 @@ function draw_dust(){
     if(dusts[player] == undefined)
       dusts[player] = new Dust(current.x, current.y);
     dust = dusts[player];
-    dust.update({x: current.x, y: current.y}, drift && current.in_air == 0);
+    dust.update({x: current.x, y: current.y}, current.drift && current.in_air == 0);
     particles = dust.get_particles();
     for(let i = 0; i < particles.length; i++){
       p = particles[i];
@@ -278,14 +279,17 @@ window.addEventListener("keydown", function (event) {
   if(event.key == 1)
     show_bodies = show_bodies ? false : true;
   else if(event.key == 'r'){
-      show_rules = (show_rules) ? false : true;
-      if(show_rules){
-        document.getElementById("hide_rules").style.display = "none";
-        document.getElementById("show_rules").style.display = "block";
-      }
-      else{
-        document.getElementById("hide_rules").style.display = "block"
-        document.getElementById("show_rules").style.display = "none"
-      }
+    show_rules = (show_rules) ? false : true;
+    if(show_rules){
+      document.getElementById("hide_rules").style.display = "none";
+      document.getElementById("show_rules").style.display = "block";
     }
+    else{
+      document.getElementById("hide_rules").style.display = "block"
+      document.getElementById("show_rules").style.display = "none"
+    }
+  }
+  else if(event.key == 's'){
+    single_player = true;
+  }
 });

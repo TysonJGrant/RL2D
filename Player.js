@@ -5,6 +5,7 @@ class Player {
       friction: 0.5,
       frictionAir: 0.02
     };
+    this.single_player = false;
     this.initials = {x: xpos, y: ypos, angle: angle}
     this.car = global.Bodies.rectangle(xpos, ypos, width, height, this.options);
     global.World.add(global.engine.world, this.car);
@@ -130,7 +131,7 @@ class Player {
 
     global.Body.setAngle(this.car, this.car_angle*Math.PI/180);
     this.travelling_angle = this.travelling_angle % 360;
-    this.car_angle = this.car_angle % 360;
+    this.car_angle = (this.car_angle + 360) % 360;
     return {x: this.velocity*xspeed, y: this.velocity*yspeed};
   }
 
@@ -149,7 +150,6 @@ class Player {
         let change = data.pedal*0.8;    //amount to accelerate by
         if(this.is_boosting)
           change += 0.4;
-
         if(change > 0){       //player controlled acceleration
           if(this.is_boosting)
             this.accelerate(this.BOOST_SPEED, change);
@@ -174,6 +174,7 @@ class Player {
   }
 
   update_player(data){
+    this.single_player = data.single_player;
     if(this.in_air > 0)
       this.in_air--;
     this.manage_controller_input(data);
@@ -224,7 +225,9 @@ class Player {
       in_air: this.in_air,
       is_alive: this.is_alive,
       velocity: this.velocity,
-      colour: this.colour
+      colour: this.colour,
+      drift: this.is_drifting,
+      boost: this.is_boosting
     }
   }
 

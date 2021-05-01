@@ -4,6 +4,7 @@ var score = {blue: 0, orange: 0};
 var timer = 300;
 
 var Player = require('./Player.js');
+var PlayerAI = require('./PlayerAI.js');
 var Ball = require('./Ball.js');
 var Field = require('./Field.js');
 var world_objects = [];
@@ -50,6 +51,21 @@ var players = {};
 
 //Main loop
 setInterval(function(){
+  if(Object.keys(players).length == 1){               //manage ai opponent
+    Object.keys(players).forEach(function(player) {
+      if(players[player].single_player){
+        players[player].reset_position();
+        ball.reset_position();
+        if(players[player].colour == "blue")
+          players["ai"] = new PlayerAI(1233, 519, 30, 14, 0, "orange");
+        else
+          players["ai"] = new PlayerAI(318, 519, 30, 14, 180, "blue");
+      }
+    })
+  }
+  if(players["ai"] != undefined)
+    players["ai"].update_player(ball.get_info());
+
   Engine.update(engine, 16);
   ball.update();
   let scored = ball.goal_scored();
@@ -64,7 +80,7 @@ setInterval(function(){
   };
   field.update(players);
   if(Object.keys(players).length > 1)
-    timer -= 0.04;
+    timer -= 0.05;
   else
     timer = 300;
 
@@ -84,7 +100,7 @@ setInterval(function(){
   //   world_info.push({vertices: points, angle: world_objects[i].angle});
   // }
   io.sockets.emit('update_game', {players: players_info, ball: ball.get_info(), bodies: world_info, boosts: field.get_boost_info(), score: score, timer: Math.round(timer)});
-}, 40);
+}, 50);
 
 io.on('connection', (socket) => {
   socket.on('new-player', () => {
@@ -100,6 +116,10 @@ io.on('connection', (socket) => {
             players[socket.id] = new Player(1233, 519, 30, 14, 0, "orange");
           else
             players[socket.id] = new Player(318, 519, 30, 14, 180, "blue");
+          if(ai != ""){
+            ai.destroy();
+            ai = "";
+          }
         })
       }
       console.log("New Player. ID: " + socket.id);
@@ -120,6 +140,9 @@ io.on('connection', (socket) => {
     console.log(socket.id + " disconnected");
     if(players[socket.id] != undefined)
       players[socket.id].destroy();
-    delete players[socket.id]
+    if(players["ai"] != undefined)
+      players["ai"].destroy();
+    delete players[socket.id];
+    delete players["ai"];
   })
 })
